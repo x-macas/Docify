@@ -1,5 +1,5 @@
 import express from 'express'
-import { registerUser,loginUser, getProfile, updateProfile, bookAppointment, listAppointment } from '../controllers/userController.js'
+import { registerUser,loginUser, getProfile, updateProfile, bookAppointment,listAppointment } from '../controllers/userController.js'
 import authUser from '../middlewares/authUser.js'
 import upload from '../middlewares/multer.js'
 import doctorModel from "../models/doctorModel.js";

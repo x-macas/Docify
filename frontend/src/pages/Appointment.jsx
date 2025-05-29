@@ -13,7 +13,7 @@ const Appointment = () => {
     currencySymbol,
     backendUrl,
     token,
-    doctorsData,
+    userData,
     getDoctorsData,
   } = useContext(AppContext);
   const [docInfo, setDocInfo] = useState(null);
@@ -117,13 +117,13 @@ const Appointment = () => {
     if (!token) {
       toast.warn("Login to book appointment");
       return navigate("/login");
-    }
+    } 
 
     if (selectedTime === null) {
       toast.warn("Please select a time slot");
       return;
     }
-
+     
     try {
       const date = docSlots[slotIndex][0].datetime;
       let day = date.getDate();
@@ -135,7 +135,7 @@ const Appointment = () => {
 
       const { data } = await axios.post(
         backendUrl + "/api/user/book-appointment",
-        { docId, slotDate, slotTime },
+        { userId:userData._id, docId, slotDate, slotTime },
         { headers: { token } }
       );
 
