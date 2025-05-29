@@ -36,32 +36,31 @@ const MyAppointments = () => {
       <p className="text-2xl font-semibold mb-6">My Appointments</p>
       <div className="grid gap-6">
        {appointments.map((item, index) => {
-  const doctor = item.doctor; // Now using the transformed doctor data
   return (
     <div key={index} className="p-4 border rounded shadow-md flex items-center gap-6">
       {/* Doctor's Image */}
-      {doctor?.image && (
+      {item.docData && (
         <img 
-          src={doctor.image} 
-          alt={doctor.name || "Doctor"} 
+          src={item.docData.image} 
+          alt={item.docData.name || "Doctor"} 
           className="w-24 h-24 object-cover rounded" 
         />
       )}
       
       <div className="flex-grow">
         <p className="text-lg font-medium">
-          {doctor?.name || "Unknown Doctor"}
+          {item.docData?.name || "Unknown Doctor"}
         </p>
         <p className="text-gray-600">
-          {doctor?.speciality || "Speciality not available"}
+          {item.docData?.speciality || "Speciality not available"}
         </p>
         
         {/* Address */}
-        {doctor?.address ? (
+        {item.docData?.address ? (
           <div className="mt-2">
-            <p className="text-sm">{doctor.address.line1}</p>
-            {doctor.address.line2 && (
-              <p className="text-sm">{doctor.address.line2}</p>
+            <p className="text-sm">{item.docData.address.line1}</p>
+            {item.docData.address.line2 && (
+              <p className="text-sm">{item.docData.address.line2}</p>
             )}
           </div>
         ) : (

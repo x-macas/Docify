@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import { v2 as cloudinary } from "cloudinary";
 import appointmentModel from "../models/appointmentModel.js";
 import doctorModel from '../models/doctorModel.js';
-
+import  razorpay from 'razorpay'
 // Register User
 const registerUser = async (req, res) => {
   try {
@@ -139,57 +139,73 @@ const updateProfile = async (req, res) => {
 };
 
 // Book Appointment
-const bookAppointment = async (req, res) => {
+const bookAppointment = async (req, res) =>{
   try {
-    const { docId, slotDate, slotTime } = req.body;
-    const userId = req.userId;
+    const {userId,docId,slotDate,slotTime}=req.body;
+    const docData=await doctorModel.findById(docId).select('-password')
 
-    const doctor = await doctorModel.findById(docId);
-    if (!doctor) return res.status(404).json({ success: false, message: 'Doctor not found' });
+    if(!docData.available){
+      return res.json({success:false,message:' doctor Not available'})
+    }
 
-    const user = await userModel.findById(userId);
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    let slots_booked=docData.slots_booked 
+    //check slots aailabilit
+    if(slots_booked[slotDate]) {
+      if(slots_booked[slotDate].includes(slotTime)){
+return res.json({success:false,message:' slot Not available'})
+      }else{
+        slots_booked[slotDate].push(slotTime)
+      }
+    }else{
+      slots_booked[slotDate]=[]
+      slots_booked[slotDate].push(slotTime)
+    }
 
-    const newAppointment = new appointmentModel({
+    const userData=await userModel.findById(userId).select('-password')
+    delete docData.slots_booked
+
+    const appointmentData={
       userId,
       docId,
-      amount: doctor.fees,
+      userData,
+      docData,
+      amount:docData.fees,
       slotTime,
       slotDate,
-      date: Date.now()
-    });
+      date:Date.now()
+    }
 
-    await newAppointment.save();
+    const newAppointment=new appointmentModel(appointmentData)
 
-    return res.json({ success: true, message: 'Appointment Booked!' });
+    await newAppointment.save()
+
+    //save newslotdata
+
+    await doctorModel.findByIdAndUpdate(docId,{slots_booked})
+    res.json({success:true,message:'appointment booked'})
+
+
   } catch (error) {
-    console.error("Booking error:", error);
-    return res.status(500).json({ success: false, message: error.message });
+     res.json({success: false,
+      message: error.message || "Internal server error"})
   }
-};
+}
 
-// List Appointments
 const listAppointment = async (req, res) => {
   try {
-    const appointments = await appointmentModel
-      .find({})
-      .populate('docId') // Populates full doctor object
-      .exec();
+    // Use req.userId from auth middleware instead of req.body
+    const appointments = await appointmentModel.find({ userId: req.userId })
+      .sort({ date: -1 }); // Sort by date descending
 
-    // Rename `docId` to `docData` to match your frontend expectation
-    const finalResult = appointments.map((appointment) => {
-      const obj = appointment.toObject();
-      obj.docData = obj.docId;   // assign full doctor data
-      delete obj.docId;          // optional: remove old field
-      return obj;
+    res.json({ success: true, appointments });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      message: error.message 
     });
-
-    res.status(200).json(finalResult);
-  } catch (err) {
-    console.error("Error fetching appointments:", err);
-    res.status(500).json({ message: "Failed to fetch appointments" });
   }
 };
+  
 
 export {
   registerUser,
