@@ -6,9 +6,10 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 
 const MyAppointments = () => {
-  const { backendUrl, token } = useContext(AppContext);
+  const { backendUrl, token, getDoctorsData } = useContext(AppContext);
 
   const [appointments, setAppointments] = useState([]);
+   
 
   const getUserAppointments = async () => {
     try {
@@ -16,7 +17,7 @@ const MyAppointments = () => {
 
       if (data.success) {
         setAppointments(data.appointments.reverse());
-        console.log(data.appointments);
+        //console.log(data.appointments);
       }
     } catch (error) {
       console.log(error);
@@ -27,10 +28,26 @@ const MyAppointments = () => {
   useEffect(() => {
     if (token) {
       getUserAppointments();
+      getDoctorsData()
     }
   }, [token]);
 
   
+  const cancelAppointment=async(appointmentId)=>{
+    try {
+      const {data}=await axios.post(backendUrl+'/api/user/cancel-appointment',{appointmentId},{headers:{token}})
+      if(data.succes){
+        toast.success(data.message)
+        getUserAppointments
+      }else{
+        toast.error(data.message)
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  }
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <p className="text-2xl font-semibold mb-6">My Appointments</p>
@@ -78,12 +95,12 @@ const MyAppointments = () => {
       
       {/* Action buttons */}
       <div className="flex flex-col gap-2">
-        {!item.payment && (
+        {!item.cancelled && (
           <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
             Pay ₹{item.amount}
           </button>
         )}
-        <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+        <button onClick={()=>cancelAppointment(item._id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
           {item.cancelled ? "Cancelled" : "Cancel"}
         </button>
       </div>
