@@ -1,10 +1,10 @@
 import React, { useContext, useEffect } from 'react';
 import { AdminContext } from '../../context/AdminContext';
 import { AppContext } from '../../context/AppContext';
-import { assets } from '../../assets/assets';
+import { assets } from '../../assets/assets'; 
 
 const AllAppointments = () => {
-  const { getAllAppointments, aToken, appointments } = useContext(AdminContext);
+  const { getAllAppointments, aToken, appointments,cancelAppointment } = useContext(AdminContext);
   const { calculateAge, currency } = useContext(AppContext);
 
   useEffect(() => {
@@ -86,7 +86,7 @@ const AllAppointments = () => {
                 {item.cancelled ? (
                   <span className="text-red-500">Cancelled</span>
                 ) : (
-                  <button className="hover:opacity-80">
+                  <button onClick={()=>cancelAppointment(item._id)}className="hover:opacity-80">
                     <img 
                       src={assets.cancel_icon} 
                       alt="Cancel" 

@@ -4,6 +4,8 @@ import { v2 as cloudinary } from "cloudinary";
 import doctorModel from "../models/doctorModel.js";
 import jwt from "jsonwebtoken";
 import appointmentModel from "../models/appointmentModel.js";
+// import { use } from "react";
+import userModel from "../models/userModel.js"; 
 
 const addDoctor = async (req, res) => {
   try {
@@ -22,7 +24,17 @@ const addDoctor = async (req, res) => {
     const imageFile = req.file; // Could be `undefined` if no file uploaded
 
     // Check for missing required fields (excluding image)
-    if (!name || !password || !email || !speciality || !degree || !experience || !about || !fees || !address) {
+    if (
+      !name ||
+      !password ||
+      !email ||
+      !speciality ||
+      !degree ||
+      !experience ||
+      !about ||
+      !fees ||
+      !address
+    ) {
       return res.status(400).json({
         success: false,
         message: "Missing required details",
@@ -121,14 +133,16 @@ const addDoctor = async (req, res) => {
 };
 
 //adding api for admin login
- 
 
 const loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     // Validate credentials
-    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+    if (
+      email === process.env.ADMIN_EMAIL &&
+      password === process.env.ADMIN_PASSWORD
+    ) {
       // Generate JWT token (payload should be an object)
       const token = jwt.sign(
         { email }, // Payload
@@ -160,24 +174,87 @@ const loginAdmin = async (req, res) => {
 
 // API to get all doctors list for admin panel
 const allDoctors = async (req, res) => {
-    try {
-        const doctors = await doctorModel.find({}).select('-password');
-        res.json({ success: true, doctors });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ success: false, message: error.message });
-    }
+  try {
+    const doctors = await doctorModel.find({}).select("-password");
+    res.json({ success: true, doctors });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 //api to get all appointments list
-const appointmentsAdmin=async(req,res)=>{
+const appointmentsAdmin = async (req, res) => {
   try {
-    const appointments=await appointmentModel.find({})
-    res.json({success:true,appointments})
+    const appointments = await appointmentModel.find({});
+    res.json({ success: true, appointments });
   } catch (error) {
     console.log(error);
-        res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
-}
+};
 
-export { addDoctor, loginAdmin, allDoctors,appointmentsAdmin };
+//api for appoinment cancaellation
+const appointmentCancel = async (req, res) => {
+  try {
+    const { appointmentId } = req.body;
+
+    const appointmentData = await appointmentModel.findById(appointmentId);
+
+    await appointmentModel.findByIdAndUpdate(appointmentId, {
+      cancelled: true,
+    });
+
+    // Releasing doctor's slot
+    const { docId, slotDate, slotTime } = appointmentData;
+    const doctorData = await doctorModel.findById(docId);
+    let slots_booked = doctorData.slots_booked;
+
+    if (slots_booked[slotDate]) {
+      slots_booked[slotDate] = slots_booked[slotDate].filter(
+        (e) => e != slotTime
+      );
+      await doctorModel.findByIdAndUpdate(docId, { slots_booked });
+    }
+
+    res.json({ success: true, message: "Appointment Cancelled" }); // Fix typo "succes" to "success"
+  } catch (error) {
+    // Add error parameter
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+//api to get dashboard data for admin panel
+const adminDashboard = async (req, res) => {
+  try {
+    const doctors = await doctorModel.find({});
+    const users = await userModel.find({});
+    const appointments = await appointmentModel.find({});
+
+    const dashData={
+      doctors:doctors.length,
+      appointments:appointments.length,
+      patients:users.length,
+      latestappointments:appointments.reverse().slice(0,5)
+    }
+
+    res.json({success:true,dashData})
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export {
+  addDoctor,
+  loginAdmin,
+  allDoctors,
+  appointmentsAdmin,
+  appointmentCancel,
+  adminDashboard
+};
