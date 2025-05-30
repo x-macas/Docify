@@ -8,6 +8,7 @@ export const AdminContext = createContext(null);
 const AdminContextProvider = ({ children }) => {
   const [aToken, setAToken] = useState(null); // Initialize as null
   const [doctors, setDoctors] = useState([]); // Moved before `value`
+  const [appointments,setAppointments]=useState([])
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   // Sync with localStorage on initial load
@@ -59,7 +60,21 @@ const AdminContextProvider = ({ children }) => {
     }
   }
 
-  const value = { aToken, setAToken, backendUrl, doctors, getAllDoctors, changeAvailability }; // Now all variables are defined
+  const getAllAppointments=async()=>{
+    try {
+      const {data}=await axios.get(backendUrl+'/api/admin/appointments',{headers:{aToken}})
+      if(data.success){
+        setAppointments(data.appointments)
+        console.log(data.appointments)
+      }else{
+        toast.error(error.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  const value = { aToken, setAToken, backendUrl, doctors, getAllDoctors, changeAvailability, appointments,setAppointments,getAllAppointments }; // Now all variables are defined
 
   return (
     <AdminContext.Provider value={value}>{children}</AdminContext.Provider>
