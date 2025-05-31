@@ -12,7 +12,9 @@ import AddDoctor from "./pages/Admin/AddDoctor";
 import DoctorList from "./pages/Admin/DoctorList";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { DoctorContext } from "./context/DoctorContext";
-
+import DoctorDashboard from "./pages/Doctor/DoctorDashboard";
+import DoctorAppointment from "./pages/Doctor/DoctorAppointment";
+import DoctorProfile from "./pages/Doctor/DoctorProfile";
 
 const App = () => {
   const { aToken } = useContext(AdminContext);
@@ -31,11 +33,31 @@ const App = () => {
         <Sidebar />
         <main className="flex-1 overflow-auto p-4 bg-gray-50">
           <Routes>
+            {/* //admin routes */}
             <Route path="/admin-dashboard" element={<Dashboard />} />
             <Route path="/all-appointments" element={<AllAppointments />} />
             <Route path="/add-doctor" element={<AddDoctor />} />
             <Route path="/doctor-list" element={<DoctorList />} />
-            <Route path="/" element={<></>} />
+            <Route
+              path="/"
+              element={
+                aToken ? (
+                  <Navigate to="/admin-dashboard" replace />
+                ) : dToken ? (
+                  <Navigate to="/doctor-dashboard" replace />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
+
+            {/* doctor routes */}
+            <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+            <Route
+              path="/doctor-appointments"
+              element={<DoctorAppointment />}
+            />
+            <Route path="/doctor-profile" element={<DoctorProfile />} />
           </Routes>
         </main>
       </div>

@@ -2,9 +2,11 @@ import React, { useContext } from 'react'
 import { AdminContext } from '../context/AdminContext'
 import { NavLink } from 'react-router-dom'
 import { assets } from '../assets/assets'
+import { DoctorContext } from '../context/DoctorContext'
 
 const Sidebar = () => {
     const { aToken } = useContext(AdminContext)
+    const {dToken}=useContext(DoctorContext)
     //console.log('aToken value:', aToken)
     return (
         <div className="w-64 min-h-screen bg-white shadow-md">
@@ -56,8 +58,48 @@ const Sidebar = () => {
                     </li>
                 </ul>
             )}
+            {dToken && (
+                <ul className="p-4 space-y-2">
+                    <li>
+                        <NavLink 
+                            to={'/doctor-dashboard'}
+                            className={({ isActive }) => 
+                                `flex items-center p-3 rounded-lg transition-colors ${isActive ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`
+                            }
+                        >
+                            <img src={assets.home_icon} alt="" className="w-5 h-5 mr-3" />
+                            <p className="font-medium">Dashboard</p>
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink 
+                            to={'/doctor-appointments'}
+                            className={({ isActive }) => 
+                                `flex items-center p-3 rounded-lg transition-colors ${isActive ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`
+                            }
+                        >
+                            <img src={assets.appointment_icon} alt="" className="w-5 h-5 mr-3" />
+                            <p className="font-medium">Appointments</p>
+                        </NavLink>
+                    </li>
+                     
+                    <li>
+                        <NavLink 
+                            to={'/doctor-profile'}
+                            className={({ isActive }) => 
+                                `flex items-center p-3 rounded-lg transition-colors ${isActive ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`
+                            }
+                        >
+                            <img src={assets.people_icon} alt="" className="w-5 h-5 mr-3" />
+                            <p className="font-medium">Profile</p>
+                        </NavLink>
+                    </li>
+                </ul>
+            )}
         </div>
     )
+
+
 }
 
 export default Sidebar
