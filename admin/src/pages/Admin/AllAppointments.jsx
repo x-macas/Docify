@@ -85,7 +85,9 @@ const AllAppointments = () => {
               <div className="flex justify-center">
                 {item.cancelled ? (
                   <span className="text-red-500">Cancelled</span>
-                ) : (
+                ) : 
+                item.isCompleted?
+                <p className='text-green-500'>Completed</p>:(
                   <button onClick={()=>cancelAppointment(item._id)}className="hover:opacity-80">
                     <img 
                       src={assets.cancel_icon} 
