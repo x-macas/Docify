@@ -16,7 +16,7 @@ connectCloudinary()
 
 // middleware
 app.use(cors({ 
-  origin: ['https://docifyy.netlify.app/', 'https://docifyadmin.netlify.app/'], 
+  origin: ['http://localhost:5174','http://localhost:5173','https://docifyy.netlify.app', 'https://docifyadmin.netlify.app'], 
   credentials: true,
 }));
 app.use(express.json())
