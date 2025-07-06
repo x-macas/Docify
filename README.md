@@ -30,7 +30,7 @@
 ### Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/docifyy
+git clone https://github.com/Ninadkasture/docifyy
 cd docifyy
 
 Install dependencies
@@ -153,7 +153,4 @@ Contact
 
 For queries, feedback, or issues, please use the GitHub Issues section.
 
-
-✅ Just paste this into your `README.md`, replace `<your-username>` with your actual GitHub username, and you're done!
-
-Let me know if you want screenshot placeholders, badges, or GitHub Actions setup too.
+ 
