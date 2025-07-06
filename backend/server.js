@@ -15,28 +15,18 @@ connectDB()
 connectCloudinary()
 
 // middleware
-app.use(cors({ 
-  origin: ['http://localhost:5174','http://localhost:5173','https://docifyy.netlify.app', 'https://docifyadmin.netlify.app'], 
-  credentials: true,
+app.use(cors({
+  origin: [
+    'http://localhost:5174',
+    'http://localhost:5173',
+    'https://docifyy.netlify.app',
+    'https://docifyadmin.netlify.app'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
-app.use((req, res, next) => {
-    res.setHeader("Access-control-allow-origin", "https://docifyy.netlify.app");
-    res.setHeader(
-        "Access-Control-Allow-Methods",
-        "GET, POST, PUT, DELETE, OPTIONS"
-    );
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    if (req.method === "OPTIONS") {
-        // Handle preflight request
-        res.sendStatus(200);
-    } else {
-        next();
-    }
-})
+
 app.use(express.json())
  
 // api endpoints
