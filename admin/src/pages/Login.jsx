@@ -30,7 +30,7 @@ const Login = () => {
         toast.error(data.message || "Login failed");
       }
     }else{
-      const {data}=await axios.post(backendUrl+'/api/doctor/login',{email,password})
+      const {data}=await axios.post(backendUrl+'/api/doctor/login',{email,password}, {withCredentials: true} )
       if (data.success) {
         localStorage.setItem("dToken", data.token);
         setDToken(data.token);
